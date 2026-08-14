@@ -98,6 +98,23 @@
   --hero-shift: -25vw;
 }
 
+/*
+ * The nav rides in the hero flow instead of a fixed header, so it scrolls away on its own.
+ * Both auto margins split the leftover height, which pins the nav to the top of the hero and
+ * keeps the title and logo centered in the space under it. Below 768px the nav is hidden and
+ * the panel toggle takes over, so the auto margins have to go with it.
+ */
+@media (min-width: 768px) {
+  .hero__nav {
+    margin-bottom: auto;
+    transform: translateX(var(--hero-shift, 0));
+  }
+
+  .hero__logo {
+    margin-bottom: auto;
+  }
+}
+
 .hero__tilt {
   width: 100%;
   display: flex;

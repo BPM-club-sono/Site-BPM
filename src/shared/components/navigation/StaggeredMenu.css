@@ -4,6 +4,8 @@
   height: 100%;
   z-index: 40;
   pointer-events: none;
+  /* Shared by the header padding and the desktop nav offset math below. */
+  --sm-header-pad: 2rem;
 }
 
 .staggered-menu-wrapper.fixed-wrapper {
@@ -24,7 +26,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 2em;
+  padding: var(--sm-header-pad);
   background: transparent;
   pointer-events: none;
   z-index: 20;
@@ -55,10 +57,68 @@
   line-height: 1;
   overflow: visible;
   transition: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+[data-open] .sm-toggle {
+  text-shadow: none;
 }
 
 .sm-toggle:focus-visible {
-  outline: none;
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+.sm-desktop-nav {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 1.5rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity 0.3s ease;
+}
+
+.sm-desktop-nav-link {
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  line-height: 1;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.sm-desktop-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sm-desktop-nav-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.sm-desktop-nav-link.active {
+  color: #000000;
+  background: #ffffff;
+}
+
+/* The panel (z-index 10) slides under the header (z-index 20) — fade the inline nav out while it is open. */
+[data-open] .sm-desktop-nav {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sm-toggle-textWrap {
@@ -332,6 +392,29 @@
 .sm-panel-list[data-numbering] .sm-panel-item:focus-visible::after {
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.88);
+}
+
+@media (min-width: 1024px) {
+  .sm-desktop-nav {
+    display: flex;
+    margin-right: 0;
+  }
+
+  /* The inline nav replaces the panel on desktop — the toggle would just repeat it. */
+  .sm-toggle {
+    display: none;
+  }
+
+  /*
+   * On the home page, line the pill up with the hero column instead of the viewport edge.
+   * .hero__title and .hero__logo are centered then pushed by --hero-shift, so their center is
+   * at 50vw + var(--hero-shift) — reuse that same variable here so the two can't drift apart.
+   * The pill is flush right by default, hence the shift is (target center) - (100vw - padding);
+   * the 50% resolves against the pill's own width, whatever the labels are.
+   */
+  .home[data-hero-side] .sm-desktop-nav {
+    transform: translateX(calc(50% - 50vw + var(--hero-shift, 0px) + var(--sm-header-pad)));
+  }
 }
 
 @media (max-width: 1024px) {

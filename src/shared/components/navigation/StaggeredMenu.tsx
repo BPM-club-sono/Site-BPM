@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { gsap } from "gsap";
 import type { NavigationItem, SocialLink } from "@/shared/types/navigation";
 import "./StaggeredMenu.css";
@@ -502,6 +502,31 @@ const StaggeredMenu = ({
       </div>
 
       <header className="staggered-menu-header" aria-label="Main navigation header">
+        <nav className="sm-desktop-nav" aria-label="Navigation principale">
+          {items.map((item, index) =>
+            item.isExternal || isExternalHref(item.href) ? (
+              <a
+                key={`desktop-${item.label}-${index}`}
+                className="sm-desktop-nav-link"
+                href={item.href}
+                aria-label={item.ariaLabel}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <NavLink
+                key={`desktop-${item.label}-${index}`}
+                className="sm-desktop-nav-link"
+                to={item.href}
+                aria-label={item.ariaLabel}
+                end
+              >
+                {item.label}
+              </NavLink>
+            )
+          )}
+        </nav>
+
         <button
           ref={toggleButtonRef}
           className="sm-toggle"

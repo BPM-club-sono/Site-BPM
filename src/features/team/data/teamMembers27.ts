@@ -27,7 +27,7 @@ import slavikPhoto from "@/assets/pp_team/27/Slavik.webp";
 import williamPhoto from "@/assets/pp_team/27/William.webp";
 import zeinebPhoto from "@/assets/pp_team/27/Zeineb.webp";
 
-export const teamMembers: TeamMemberNode[] = [
+export const teamMembers27: TeamMemberNode[] = [
   { id: "president", name: "Jean", role: "Président", photo: jeanPhoto, x: 0, y: 0 },
   { id: "secretaire", name: "Luca", role: "Secrétaire", photo: lucaPhoto, x: 0, y: 200 },
   { id: "hector", name: "Hector", role: "VP Lights", photo: hectorPhoto, x: -200, y: 60 },

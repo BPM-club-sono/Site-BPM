@@ -42,13 +42,13 @@ docker run --rm -p 8080:80 site-bpm
 
 ### 1) Modifier l'organigramme (`/equipe`)
 
-Fichiers concernés :
+Un mandat = un fichier de données. Fichiers concernés :
 
-- `src/features/team/data/teamMembers.ts` (données des membres)
-- `src/features/team/TeamPage.tsx` (compteur visuel en gros derrière le graphe)
+- `src/features/team/data/teamMembers<annee>.ts` (données des membres d'un mandat, ex. `teamMembers28.ts`)
+- `src/features/team/data/teamRosters.ts` (liste ordonnée des mandats affichés en onglets, du plus récent au plus ancien)
 - `src/features/team/constants.ts` (taille de canvas si besoin de plus d'espace)
 
-Le fichier `teamMembers.ts` contient un tableau d'objets :
+Chaque fichier `teamMembers<annee>.ts` contient un tableau d'objets :
 
 ```ts
 {
@@ -63,10 +63,11 @@ Le fichier `teamMembers.ts` contient un tableau d'objets :
 
 Règles pratiques :
 
-- `id` doit rester unique.
+- `id` doit rester unique **dans le fichier de son mandat** (deux mandats différents peuvent réutiliser le même id).
 - `x` / `y` pilotent la position de la carte sur le canvas.
-- Pour une nouvelle photo, ajouter le fichier dans `src/assets/pp_team/`, importer l'image dans `teamMembers.ts`, puis l'utiliser dans `photo`.
-- Mettre à jour le nombre affiché dans `TeamPage.tsx` (actuellement `27`) pour refléter l'effectif réel.
+- Pour une nouvelle photo, ajouter le fichier dans `src/assets/pp_team/<annee>/`, importer l'image dans le `teamMembers<annee>.ts` correspondant, puis l'utiliser dans `photo`.
+- Le grand nombre affiché sur `/equipe` est le `year` du mandat sélectionné (pas l'effectif) — vient automatiquement de `teamRosters.ts`, rien à mettre à jour manuellement.
+- Pour ajouter un nouveau mandat : créer `teamMembers<annee>.ts`, puis l'ajouter en tête de la liste dans `teamRosters.ts` pour qu'il devienne l'onglet par défaut.
 - Si ça déborde à l'écran, augmenter `TEAM_CANVAS_WIDTH` et `TEAM_CANVAS_HEIGHT` dans `constants.ts`.
 
 ### 2) Modifier les mails de contact (section contact de l'accueil)

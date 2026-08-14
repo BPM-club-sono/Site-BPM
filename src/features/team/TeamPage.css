@@ -96,6 +96,43 @@
   background: #ffffff;
 }
 
+.team-year-tabs {
+  position: absolute;
+  top: clamp(16px, 3vw, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 4;
+}
+
+.team-year-tab {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: #000000;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.team-year-tab:hover,
+.team-year-tab:focus-visible {
+  transform: translateY(-1px);
+}
+
+.team-year-tab[data-active] {
+  color: #000000;
+  border-color: #ffffff;
+  background: #ffffff;
+}
+
 .team-hint {
   position: absolute;
   top: clamp(44px, 6vw, 64px);
@@ -187,8 +224,7 @@
   .team-frame {
     background:
       radial-gradient(circle at 16% 0%, rgba(36, 112, 255, 0.16), transparent 36%),
-      radial-gradient(circle at 82% 0%, rgba(255, 136, 42, 0.14), transparent 34%),
-      #040404;
+      radial-gradient(circle at 82% 0%, rgba(255, 136, 42, 0.14), transparent 34%), #040404;
     border-color: rgba(255, 255, 255, 0.08);
   }
 

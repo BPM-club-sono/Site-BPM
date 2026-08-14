@@ -1,6 +1,7 @@
+import { useState } from "react";
 import bpmWatermark from "@/assets/BPM_typo.png";
 import { TEAM_CANVAS_CENTER, TEAM_CARD_SIZE } from "@/features/team/constants";
-import { teamMembers } from "@/features/team/data/teamMembers";
+import { teamRosters } from "@/features/team/data/teamRosters";
 import { useTeamCanvas } from "@/features/team/hooks/useTeamCanvas";
 import type { TeamMemberNode } from "@/features/team/types";
 import PageShell from "@/shared/components/layout/PageShell";
@@ -17,6 +18,7 @@ const getTeamNodePositionStyle = (member: TeamMemberNode) => {
 };
 
 const TeamPage = () => {
+  const [selectedYearIndex, setSelectedYearIndex] = useState(0);
   const {
     viewportRef,
     canvasRef,
@@ -31,16 +33,39 @@ const TeamPage = () => {
     handleWheel
   } = useTeamCanvas();
 
+  const selectedRoster = teamRosters[selectedYearIndex];
+
+  const selectYear = (index: number) => {
+    setSelectedYearIndex(index);
+    resetView();
+  };
+
   return (
     <PageShell pageClassName="team">
       <section className="team-frame">
         <img className="team-watermark" src={bpmWatermark} alt="" aria-hidden="true" />
 
         <div className="team-bg-number" aria-hidden="true">
-          27
+          {selectedRoster.year}
         </div>
 
         <div className="team-label">Organigramme</div>
+
+        <div className="team-year-tabs" role="tablist" aria-label="Choisir le mandat">
+          {teamRosters.map((roster, index) => (
+            <button
+              key={roster.year}
+              type="button"
+              role="tab"
+              aria-selected={index === selectedYearIndex}
+              className="team-year-tab"
+              data-active={index === selectedYearIndex || undefined}
+              onClick={() => selectYear(index)}
+            >
+              {roster.year}
+            </button>
+          ))}
+        </div>
 
         <div className="team-toolbar">
           <button type="button" className="team-button" onClick={zoomIn}>
@@ -71,7 +96,7 @@ const TeamPage = () => {
         >
           <div ref={canvasRef} className="team-canvas">
             <div className="team-tree">
-              {teamMembers.map((member) => (
+              {selectedRoster.members.map((member) => (
                 <div key={member.id} className="team-node" style={getTeamNodePositionStyle(member)}>
                   <div className="team-card">
                     <img className="team-avatar" src={member.photo} alt={member.name} loading="lazy" />

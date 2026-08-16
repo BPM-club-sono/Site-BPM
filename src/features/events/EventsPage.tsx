@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import PageShell from "@/shared/components/layout/PageShell";
+import InlineNav from "@/shared/components/navigation/InlineNav";
 import "./EventsPage.css";
 
 type EventData = {
@@ -103,8 +104,9 @@ const EventsPage = () => {
   }, [selectedPhoto]);
 
   return (
-    <PageShell pageClassName="events-page">
+    <PageShell pageClassName="events-page" hideToggleAtTop>
       <section className="events-page__hero">
+        <InlineNav className="events-page__nav" />
         <p className="events-page__kicker">BPM Club Light & Sono</p>
         <h1>Nos Grosses Prestations</h1>
       </section>

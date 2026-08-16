@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import type { NavigationItem, SocialLink } from "@/shared/types/navigation";
+import { isExternalHref } from "@/shared/lib/url/isExternalHref";
 import "./StaggeredMenu.css";
 
 type StaggeredMenuProps = {
@@ -17,6 +18,7 @@ type StaggeredMenuProps = {
   accentColor?: string;
   changeMenuColorOnOpen?: boolean;
   isFixed?: boolean;
+  hideToggleAtTop?: boolean;
   closeOnClickAway?: boolean;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
@@ -24,9 +26,8 @@ type StaggeredMenuProps = {
 
 const FALLBACK_LAYER_COLORS = ["#111111", "#ffffff"];
 
-const isExternalHref = (href: string) => {
-  return href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:");
-};
+// How far the page must scroll before the toggle takes over from an inline nav.
+const TOGGLE_REVEAL_SCROLL_Y = 40;
 
 const toLayerColors = (colors?: string[]) => {
   const layerColors = colors && colors.length > 0 ? colors.slice(0, 4) : FALLBACK_LAYER_COLORS;
@@ -52,11 +53,13 @@ const StaggeredMenu = ({
   accentColor = "#000000",
   changeMenuColorOnOpen = true,
   isFixed = true,
+  hideToggleAtTop = false,
   closeOnClickAway = true,
   onMenuOpen,
   onMenuClose
 }: StaggeredMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasScrolledPastTop, setHasScrolledPastTop] = useState(false);
   const [toggleTextLines, setToggleTextLines] = useState(["Menu", "Close"]);
 
   const openRef = useRef(false);
@@ -438,6 +441,22 @@ const StaggeredMenu = ({
 
   // ----- Dismiss handlers -----
   useEffect(() => {
+    if (!hideToggleAtTop) {
+      return;
+    }
+
+    const updateScrollState = () => {
+      setHasScrolledPastTop(window.scrollY > TOGGLE_REVEAL_SCROLL_Y);
+    };
+
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", updateScrollState);
+    };
+  }, [hideToggleAtTop]);
+
+  useEffect(() => {
     if (!closeOnClickAway || !isOpen) {
       return;
     }
@@ -482,6 +501,9 @@ const StaggeredMenu = ({
     closeMenu();
   };
 
+  // Keep the toggle reachable while the panel is open, even back at the top of the page.
+  const isToggleHidden = hideToggleAtTop && !hasScrolledPastTop && !isOpen;
+
   return (
     <div
       className={[className, "staggered-menu-wrapper", isFixed ? "fixed-wrapper" : ""]
@@ -490,6 +512,7 @@ const StaggeredMenu = ({
       style={accentColor ? ({ "--sm-accent": accentColor } as CSSProperties) : undefined}
       data-position={position}
       data-open={isOpen || undefined}
+      data-toggle-hidden={isToggleHidden || undefined}
     >
       <div ref={preLayersContainerRef} className="sm-prelayers" aria-hidden="true">
         {layerColors.map((backgroundColor, index) => (

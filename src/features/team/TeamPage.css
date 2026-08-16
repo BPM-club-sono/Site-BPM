@@ -52,23 +52,21 @@
   z-index: 2;
 }
 
-.team-label {
-  position: absolute;
-  top: clamp(16px, 3vw, 24px);
-  left: clamp(18px, 3vw, 28px);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  z-index: 4;
-}
-
+/* The canvas controls take the corner the "Organigramme" title used to occupy. */
 .team-toolbar {
   position: absolute;
   top: clamp(16px, 3vw, 24px);
-  right: clamp(18px, 3vw, 28px);
+  left: clamp(18px, 3vw, 28px);
   display: flex;
   gap: 10px;
+  z-index: 4;
+}
+
+/* This page never scrolls, so the nav stays put instead of being revealed by scrolling. */
+.team-nav {
+  position: absolute;
+  top: clamp(16px, 3vw, 24px);
+  right: clamp(18px, 3vw, 28px);
   z-index: 4;
 }
 
@@ -133,13 +131,14 @@
   background: #ffffff;
 }
 
+/* Kept discreet, tucked under the controls it describes. */
 .team-hint {
   position: absolute;
-  top: clamp(44px, 6vw, 64px);
+  top: clamp(52px, 7vw, 66px);
   left: clamp(18px, 3vw, 28px);
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.38);
   z-index: 4;
 }
 
@@ -236,16 +235,10 @@
     display: none;
   }
 
-  .team-label {
-    top: 14px;
-    left: 14px;
-    font-size: 10px;
-    letter-spacing: 0.16em;
-  }
-
+  /* The panel toggle owns the right corner on narrow screens, so keep the controls clear of it. */
   .team-toolbar {
     top: 12px;
-    right: 12px;
+    left: 12px;
     gap: 6px;
   }
 

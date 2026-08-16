@@ -54,11 +54,58 @@
   text-transform: uppercase;
   line-height: 1;
   overflow: visible;
-  transition: none;
+  transition: opacity 0.35s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+/*
+ * Corner trapezoid behind the toggle: the button alone is easy to lose over scrolled photos.
+ * It bleeds past the 2em header padding to sit flush against the top and right viewport edges,
+ * and only the left edge is angled. Sizes with the button, so "Menu" and "Close" both fit.
+ */
+.sm-toggle::before {
+  content: "";
+  position: absolute;
+  top: -2rem;
+  right: -2rem;
+  bottom: -1.25rem;
+  left: -2.75rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 26% 100%);
+  z-index: -1;
+  pointer-events: none;
+  /* Coming back: wait out the 0.32s panel close tween, otherwise it fades in under the panel. */
+  transition: opacity 0.3s ease 0.32s;
+}
+
+/* The panel is white and the toggle turns black over it — the dark trapezoid would fight both. */
+[data-open] .sm-toggle::before {
+  opacity: 0;
+  /* Going away: no delay, the panel is already sliding over it. */
+  transition: opacity 0.2s ease;
+}
+
+/*
+ * At the top of a page carrying an inline nav, the toggle would duplicate it. Only above 768px
+ * though: the inline nav is hidden on narrow screens, so the toggle is the sole way to navigate.
+ */
+@media (min-width: 768px) {
+  [data-toggle-hidden] .sm-toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+[data-open] .sm-toggle {
+  text-shadow: none;
 }
 
 .sm-toggle:focus-visible {
-  outline: none;
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+  border-radius: 4px;
 }
 
 .sm-toggle-textWrap {

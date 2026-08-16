@@ -7,12 +7,18 @@ type MainElementProps = Omit<ComponentPropsWithoutRef<"main">, "className" | "ch
 type PageShellProps = MainElementProps & {
   pageClassName: string;
   children: ReactNode;
+  hideToggleAtTop?: boolean;
 };
 
-const PageShell = ({ pageClassName, children, ...mainElementProps }: PageShellProps) => {
+const PageShell = ({
+  pageClassName,
+  children,
+  hideToggleAtTop = false,
+  ...mainElementProps
+}: PageShellProps) => {
   return (
     <main className={pageClassName} {...mainElementProps}>
-      <StaggeredMenu items={navigationItems} socialItems={socialLinks} />
+      <StaggeredMenu items={navigationItems} socialItems={socialLinks} hideToggleAtTop={hideToggleAtTop} />
       {children}
     </main>
   );

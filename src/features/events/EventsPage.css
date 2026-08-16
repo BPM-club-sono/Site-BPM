@@ -1,6 +1,6 @@
 .events-page {
   min-height: 100vh;
-  padding: clamp(92px, 10vw, 124px) clamp(18px, 3.6vw, 44px) clamp(90px, 8vw, 120px);
+  padding: clamp(40px, 4vw, 84px) clamp(18px, 3.6vw, 44px) clamp(90px, 8vw, 120px);
   color: var(--text);
   background:
     radial-gradient(circle at 14% 6%, rgba(255, 125, 34, 0.22), transparent 34%),
@@ -13,6 +13,12 @@
   margin: 0 auto clamp(28px, 3.8vw, 54px);
   display: grid;
   gap: 10px;
+}
+
+/* Same nav as the home hero, centered above the title; it scrolls away and the toggle takes over. */
+.events-page__nav {
+  justify-self: center;
+  margin-bottom: clamp(10px, 1.6vw, 22px);
 }
 
 .events-page__kicker {

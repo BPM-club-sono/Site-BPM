@@ -15,6 +15,7 @@ import { equipmentCards } from "@/features/home/data/equipmentCards";
 import { eventSlides } from "@/features/home/data/eventSlides";
 import { softwareLogos, trustLogos } from "@/features/home/data/logos";
 import PageShell from "@/shared/components/layout/PageShell";
+import InlineNav from "@/shared/components/navigation/InlineNav";
 import "./HomePage.css";
 
 type HeroVariant = "light" | "mx";
@@ -45,7 +46,7 @@ const HomePage = () => {
   const resetLogoTilt = () => setLogoTilt({ x: 0, y: 0 });
 
   return (
-    <PageShell pageClassName="home" data-hero-side={heroSide} data-hero-variant={heroVariant}>
+    <PageShell pageClassName="home" hideToggleAtTop data-hero-side={heroSide} data-hero-variant={heroVariant}>
       <section className="hero noselect">
         <img
           className="hero__backdrop"
@@ -57,6 +58,8 @@ const HomePage = () => {
         />
 
         <div className="hero__content">
+          <InlineNav className="hero__nav" />
+
           <div className="hero__title">
             <h1>
               <span className="hero__big">BPM</span>

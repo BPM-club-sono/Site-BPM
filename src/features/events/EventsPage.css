@@ -15,6 +15,12 @@
   gap: 10px;
 }
 
+/* Same nav as the home hero, centered above the title; it scrolls away and the toggle takes over. */
+.events-page__nav {
+  justify-self: center;
+  margin-bottom: clamp(10px, 1.6vw, 22px);
+}
+
 .events-page__kicker {
   margin: 0;
   font-size: 0.82rem;

@@ -5,6 +5,7 @@ import { teamRosters } from "@/features/team/data/teamRosters";
 import { useTeamCanvas } from "@/features/team/hooks/useTeamCanvas";
 import type { TeamMemberNode } from "@/features/team/types";
 import PageShell from "@/shared/components/layout/PageShell";
+import InlineNav from "@/shared/components/navigation/InlineNav";
 import "./TeamPage.css";
 
 const getTeamNodePositionStyle = (member: TeamMemberNode) => {
@@ -41,7 +42,7 @@ const TeamPage = () => {
   };
 
   return (
-    <PageShell pageClassName="team">
+    <PageShell pageClassName="team" hideToggleAtTop>
       <section className="team-frame">
         <img className="team-watermark" src={bpmWatermark} alt="" aria-hidden="true" />
 
@@ -49,7 +50,7 @@ const TeamPage = () => {
           {selectedRoster.year}
         </div>
 
-        <div className="team-label">Organigramme</div>
+        <InlineNav className="team-nav" />
 
         <div className="team-year-tabs" role="tablist" aria-label="Choisir le mandat">
           {teamRosters.map((roster, index) => (

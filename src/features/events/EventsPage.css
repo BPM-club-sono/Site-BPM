@@ -1,6 +1,6 @@
 .events-page {
   min-height: 100vh;
-  padding: clamp(92px, 10vw, 124px) clamp(18px, 3.6vw, 44px) clamp(90px, 8vw, 120px);
+  padding: clamp(40px, 4vw, 84px) clamp(18px, 3.6vw, 44px) clamp(90px, 8vw, 120px);
   color: var(--text);
   background:
     radial-gradient(circle at 14% 6%, rgba(255, 125, 34, 0.22), transparent 34%),

@@ -68,7 +68,9 @@ Règles pratiques :
 - Pour une nouvelle photo, ajouter le fichier dans `src/assets/pp_team/<annee>/`, importer l'image dans le `teamMembers<annee>.ts` correspondant, puis l'utiliser dans `photo`.
 - Le grand nombre affiché sur `/equipe` est le `year` du mandat sélectionné (pas l'effectif) — vient automatiquement de `teamRosters.ts`, rien à mettre à jour manuellement.
 - Pour ajouter un nouveau mandat : créer `teamMembers<annee>.ts`, puis l'ajouter en tête de la liste dans `teamRosters.ts` pour qu'il devienne l'onglet par défaut.
-- Si ça déborde à l'écran, augmenter `TEAM_CANVAS_WIDTH` et `TEAM_CANVAS_HEIGHT` dans `constants.ts`.
+- Pas besoin d'ajuster le zoom : au chargement, au changement de mandat et au clic sur `Reset`, la vue se cadre automatiquement sur les cartes du mandat affiché, quelle que soit la taille de l'écran.
+- Réglages de ce cadrage dans `src/features/team/constants.ts` : `TEAM_FIT_PADDING` (marge laissée autour des cartes), `TEAM_MIN_SCALE` / `TEAM_MAX_SCALE` (bornes de zoom). Sur un écran étroit, le zoom bute sur `TEAM_MIN_SCALE` et il faut faire glisser pour voir le reste : baisser cette valeur si besoin.
+- `TEAM_CANVAS_WIDTH` / `TEAM_CANVAS_HEIGHT` ne servent plus qu'à dimensionner la zone déplaçable, pas le cadrage.
 
 ### 2) Modifier les mails de contact (section contact de l'accueil)
 

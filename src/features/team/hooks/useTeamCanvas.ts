@@ -1,18 +1,15 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent
 } from "react";
-import {
-  TEAM_CANVAS_HEIGHT,
-  TEAM_CANVAS_WIDTH,
-  TEAM_MAX_SCALE,
-  TEAM_MIN_SCALE
-} from "@/features/team/constants";
-import type { CanvasTransform } from "@/features/team/types";
+import { TEAM_FIT_PADDING, TEAM_MAX_SCALE, TEAM_MIN_SCALE } from "@/features/team/constants";
+import { getTeamContentBounds, getTeamFitScale } from "@/features/team/lib/teamBounds";
+import type { CanvasTransform, TeamMemberNode } from "@/features/team/types";
 import { clamp } from "@/shared/lib/math/clamp";
 
 type PointerDragState = {
@@ -33,7 +30,7 @@ const toCanvasTransformValue = (transform: CanvasTransform) => {
   return `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
 };
 
-export const useTeamCanvas = () => {
+export const useTeamCanvas = (members: TeamMemberNode[]) => {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const dragStateRef = useRef<PointerDragState | null>(null);
@@ -82,46 +79,73 @@ export const useTeamCanvas = () => {
   );
 
   // ----- Centering helpers -----
-  const centerView = useCallback((scaleOverride?: number) => {
-    if (!viewportRef.current) {
-      return;
-    }
+  const contentBounds = useMemo(() => getTeamContentBounds(members), [members]);
 
-    const scale = scaleOverride ?? transformRef.current.scale;
-    const viewportRect = viewportRef.current.getBoundingClientRect();
-
-    scheduleTransform({
-      scale,
-      x: (viewportRect.width - TEAM_CANVAS_WIDTH * scale) / 2,
-      y: (viewportRect.height - TEAM_CANVAS_HEIGHT * scale) / 2
-    });
-  }, [scheduleTransform]);
-
-  const zoomBy = useCallback((factor: number) => {
-    if (!viewportRef.current) {
-      return;
-    }
-
-    const viewportRect = viewportRef.current.getBoundingClientRect();
-    const pivotX = viewportRect.width / 2;
-    const pivotY = viewportRect.height / 2;
-
-    updateTransform((previousTransform) => {
-      const nextScale = clamp(previousTransform.scale * factor, TEAM_MIN_SCALE, TEAM_MAX_SCALE);
-      if (nextScale === previousTransform.scale) {
-        return previousTransform;
+  // Puts the middle of the cards in the middle of the viewport, at the given scale.
+  const centerContent = useCallback(
+    (scaleOverride?: number) => {
+      if (!viewportRef.current || !contentBounds) {
+        return;
       }
 
-      const contentX = (pivotX - previousTransform.x) / previousTransform.scale;
-      const contentY = (pivotY - previousTransform.y) / previousTransform.scale;
+      const scale = scaleOverride ?? transformRef.current.scale;
+      const viewportRect = viewportRef.current.getBoundingClientRect();
 
-      return {
-        scale: nextScale,
-        x: pivotX - contentX * nextScale,
-        y: pivotY - contentY * nextScale
-      };
-    });
-  }, [updateTransform]);
+      scheduleTransform({
+        scale,
+        x: viewportRect.width / 2 - contentBounds.centerX * scale,
+        y: viewportRect.height / 2 - contentBounds.centerY * scale
+      });
+    },
+    [contentBounds, scheduleTransform]
+  );
+
+  // Scales so the whole roster fits the viewport, whatever the screen and whatever the mandate.
+  const fitView = useCallback(() => {
+    if (!viewportRef.current || !contentBounds) {
+      return;
+    }
+
+    const viewportRect = viewportRef.current.getBoundingClientRect();
+    const scale = getTeamFitScale(
+      contentBounds,
+      viewportRect,
+      TEAM_FIT_PADDING,
+      TEAM_MIN_SCALE,
+      TEAM_MAX_SCALE
+    );
+
+    centerContent(scale);
+  }, [centerContent, contentBounds]);
+
+  const zoomBy = useCallback(
+    (factor: number) => {
+      if (!viewportRef.current) {
+        return;
+      }
+
+      const viewportRect = viewportRef.current.getBoundingClientRect();
+      const pivotX = viewportRect.width / 2;
+      const pivotY = viewportRect.height / 2;
+
+      updateTransform((previousTransform) => {
+        const nextScale = clamp(previousTransform.scale * factor, TEAM_MIN_SCALE, TEAM_MAX_SCALE);
+        if (nextScale === previousTransform.scale) {
+          return previousTransform;
+        }
+
+        const contentX = (pivotX - previousTransform.x) / previousTransform.scale;
+        const contentY = (pivotY - previousTransform.y) / previousTransform.scale;
+
+        return {
+          scale: nextScale,
+          x: pivotX - contentX * nextScale,
+          y: pivotY - contentY * nextScale
+        };
+      });
+    },
+    [updateTransform]
+  );
 
   // ----- Drag handlers -----
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
@@ -142,18 +166,21 @@ export const useTeamCanvas = () => {
     event.preventDefault();
   }, []);
 
-  const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    const dragState = dragStateRef.current;
-    if (!dragState) {
-      return;
-    }
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const dragState = dragStateRef.current;
+      if (!dragState) {
+        return;
+      }
 
-    updateTransform((previousTransform) => ({
-      ...previousTransform,
-      x: dragState.originX + (event.clientX - dragState.startClientX),
-      y: dragState.originY + (event.clientY - dragState.startClientY)
-    }));
-  }, [updateTransform]);
+      updateTransform((previousTransform) => ({
+        ...previousTransform,
+        x: dragState.originX + (event.clientX - dragState.startClientX),
+        y: dragState.originY + (event.clientY - dragState.startClientY)
+      }));
+    },
+    [updateTransform]
+  );
 
   const stopDragging = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     const dragState = dragStateRef.current;
@@ -170,34 +197,35 @@ export const useTeamCanvas = () => {
   }, []);
 
   // ----- Zoom handlers -----
-  const handleWheel = useCallback((event: ReactWheelEvent<HTMLDivElement>) => {
-    event.preventDefault();
+  const handleWheel = useCallback(
+    (event: ReactWheelEvent<HTMLDivElement>) => {
+      event.preventDefault();
 
-    const viewportRect = event.currentTarget.getBoundingClientRect();
-    const pointerX = event.clientX - viewportRect.left;
-    const pointerY = event.clientY - viewportRect.top;
+      const viewportRect = event.currentTarget.getBoundingClientRect();
+      const pointerX = event.clientX - viewportRect.left;
+      const pointerY = event.clientY - viewportRect.top;
 
-    updateTransform((previousTransform) => {
-      const zoomDelta = -event.deltaY * 0.0018;
-      const nextScale = clamp(previousTransform.scale + zoomDelta, TEAM_MIN_SCALE, TEAM_MAX_SCALE);
-      if (nextScale === previousTransform.scale) {
-        return previousTransform;
-      }
+      updateTransform((previousTransform) => {
+        const zoomDelta = -event.deltaY * 0.0018;
+        const nextScale = clamp(previousTransform.scale + zoomDelta, TEAM_MIN_SCALE, TEAM_MAX_SCALE);
+        if (nextScale === previousTransform.scale) {
+          return previousTransform;
+        }
 
-      const contentX = (pointerX - previousTransform.x) / previousTransform.scale;
-      const contentY = (pointerY - previousTransform.y) / previousTransform.scale;
+        const contentX = (pointerX - previousTransform.x) / previousTransform.scale;
+        const contentY = (pointerY - previousTransform.y) / previousTransform.scale;
 
-      return {
-        scale: nextScale,
-        x: pointerX - contentX * nextScale,
-        y: pointerY - contentY * nextScale
-      };
-    });
-  }, [updateTransform]);
+        return {
+          scale: nextScale,
+          x: pointerX - contentX * nextScale,
+          y: pointerY - contentY * nextScale
+        };
+      });
+    },
+    [updateTransform]
+  );
 
-  const resetView = useCallback(() => {
-    centerView(1);
-  }, [centerView]);
+  const resetView = fitView;
 
   const zoomIn = useCallback(() => {
     zoomBy(1.12);
@@ -215,16 +243,17 @@ export const useTeamCanvas = () => {
     canvasRef.current.style.transform = toCanvasTransformValue(transformRef.current);
   }, []);
 
+  // Fits on mount and again whenever the roster changes, since the bounds move with it.
   useEffect(() => {
-    centerView(1);
+    fitView();
 
     const handleResize = () => {
-      centerView();
+      centerContent();
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [centerView]);
+  }, [centerContent, fitView]);
 
   useEffect(() => {
     return () => {

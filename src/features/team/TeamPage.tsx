@@ -20,6 +20,7 @@ const getTeamNodePositionStyle = (member: TeamMemberNode) => {
 
 const TeamPage = () => {
   const [selectedYearIndex, setSelectedYearIndex] = useState(0);
+  const selectedRoster = teamRosters[selectedYearIndex];
   const {
     viewportRef,
     canvasRef,
@@ -32,13 +33,11 @@ const TeamPage = () => {
     handlePointerUp,
     handlePointerCancel,
     handleWheel
-  } = useTeamCanvas();
+  } = useTeamCanvas(selectedRoster.members);
 
-  const selectedRoster = teamRosters[selectedYearIndex];
-
+  // The canvas refits itself when the roster changes, so switching year is just a state update.
   const selectYear = (index: number) => {
     setSelectedYearIndex(index);
-    resetView();
   };
 
   return (

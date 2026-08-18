@@ -1,9 +1,8 @@
 import type { ContactSectionContent } from "@/features/home/types";
 
-const primaryRecipientEmail = "jean.vidal@telecom-sudparis.eu";
+const primaryRecipientEmail = "bpm@bde-imtbs-tsp.fr";
 const ccRecipientEmails = [
-  "hector.nussbaumer@telecom-sudparis.eu",
-  "mathieu.bonnet@telecom-sudparis.eu"
+  "noemie.puechguiral@telecom-sudparis.eu"
 ];
 
 const buildMailtoHref = (primaryRecipient: string, ccRecipients: string[]) => {

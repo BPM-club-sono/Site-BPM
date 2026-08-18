@@ -3,8 +3,10 @@
   padding: clamp(40px, 4vw, 84px) clamp(18px, 3.6vw, 44px) clamp(90px, 8vw, 120px);
   color: var(--text);
   background:
-    radial-gradient(circle at 14% 6%, rgba(255, 125, 34, 0.22), transparent 34%),
-    radial-gradient(circle at 82% 0%, rgba(30, 170, 255, 0.18), transparent 36%),
+    radial-gradient(circle 100vw at 14% -2%, rgba(255, 125, 34, 0.22), transparent 65%),
+    radial-gradient(circle 120vw at 82% -6%, rgba(30, 170, 255, 0.18), transparent 50%),
+    radial-gradient(circle 170vw at 30% 56%, rgba(30, 170, 255, 0.18), transparent 55%),
+    radial-gradient(circle 130vw at 105% 75%, rgba(255, 125, 34, 0.22), transparent 65%),
     linear-gradient(180deg, #030303 0%, #070707 100%);
 }
 

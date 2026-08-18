@@ -510,6 +510,10 @@
   .timeline-event__photo:nth-child(n + 7) {
     grid-column: span 2;
   }
+
+  .timeline-event__card--content {
+    margin-top: 0;
+  }
 }
 
 @media (max-width: 480px) {

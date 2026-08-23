@@ -3,8 +3,10 @@
   padding: clamp(40px, 4vw, 84px) clamp(18px, 3.6vw, 44px) clamp(90px, 8vw, 120px);
   color: var(--text);
   background:
-    radial-gradient(circle at 14% 6%, rgba(255, 125, 34, 0.22), transparent 34%),
-    radial-gradient(circle at 82% 0%, rgba(30, 170, 255, 0.18), transparent 36%),
+    radial-gradient(circle 100vw at 14% -2%, rgba(255, 125, 34, 0.22), transparent 65%),
+    radial-gradient(circle 120vw at 82% -6%, rgba(30, 170, 255, 0.18), transparent 50%),
+    radial-gradient(circle 170vw at 30% 56%, rgba(30, 170, 255, 0.18), transparent 55%),
+    radial-gradient(circle 130vw at 105% 75%, rgba(255, 125, 34, 0.22), transparent 65%),
     linear-gradient(180deg, #030303 0%, #070707 100%);
 }
 
@@ -151,92 +153,121 @@
   white-space: nowrap;
 }
 
+/* Nesting scale: the card owns the elevation, the rows are bare and split by hairlines. */
 .timeline-event__cards {
+  --card-radius: 18px;
+  --card-pad: 14px;
+  --hairline: rgba(255, 255, 255, 0.08);
+
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* start, not stretch: the content card keeps its natural height so its offset reads as a step. */
+  align-items: start;
 }
 
 .timeline-event__card {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 16px;
-  background: rgba(8, 8, 8, 0.86);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
   backdrop-filter: blur(6px);
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42);
-}
-
-.timeline-event__card--info {
-  padding: 14px;
-}
-
-.timeline-event__meta-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  padding: var(--card-pad);
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  align-content: start;
 }
 
-.timeline-event__meta-list li {
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
-  display: grid;
-  gap: 4px;
+/* Stepped down from the info card. A percentage is not an option here: a percentage margin
+   resolves against the containing block's width, and the height-relative unit (cqh) would need
+   container-type: size, which stops the row from being sized by its own content. */
+.timeline-event__card--content {
+  margin-top: clamp(20px, 4vw, 50px);
 }
 
-.timeline-event__meta-list span {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.65);
+/* Single ink colour inside the cards: hierarchy comes from size and letter-spacing, not tint. */
+.timeline-event__card h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.timeline-event__meta-list strong {
-  font-size: clamp(0.94rem, 1.1vw, 1.06rem);
   color: #ffffff;
 }
 
-.timeline-event__card--content {
-  padding: 16px;
-  display: grid;
-  gap: 10px;
-}
-
-.timeline-event__card--content h3 {
+.timeline-event__meta-list,
+.timeline-event__list {
   margin: 0;
-  font-size: 0.82rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.68);
-}
-
-.timeline-event__card--content ul {
-  margin: 0;
-  padding: 0;
+  padding: 2px 12px;
   list-style: none;
   display: grid;
-  gap: 8px;
 }
 
-.timeline-event__card--content li {
+.timeline-event__meta-list li + li,
+.timeline-event__list li + li {
+  border-top: 1px solid var(--hairline);
+}
+
+.timeline-event__meta-list li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+}
+
+/* Two classes on purpose: Google's own .material-symbols-outlined rule sets font-size: 24px
+   at the same specificity, and its stylesheet load order relative to ours is not guaranteed. */
+.timeline-event__meta-list .timeline-event__meta-icon {
+  font-size: 20px;
+  color: #ffffff;
+  justify-self: center;
+}
+
+.timeline-event__meta-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.timeline-event__meta-text strong {
+  font-size: clamp(0.98rem, 1.1vw, 1.12rem);
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.timeline-event__meta-text > span {
+  font-size: 0.7rem;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.timeline-event__list li {
   position: relative;
-  padding-left: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  padding: 9px 0 9px 22px;
+  color: #ffffff;
   line-height: 1.35;
 }
 
-.timeline-event__card--content li::before {
-  content: "";
+/* Material Symbols "chevron_right" by codepoint: degrades to one tofu box, not a stray word. */
+.timeline-event__list li::before {
+  content: "\e5cc";
+  font-family: "Material Symbols Outlined";
+  font-size: 18px;
+  line-height: 1;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 500,
+    "GRAD" 0,
+    "opsz" 20;
   position: absolute;
-  left: 0;
-  top: 0.56em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
+  left: -1px;
+  top: 0.72em;
+  color: #ffffff;
+  transition: transform 0.18s ease;
+}
+
+.timeline-event__list li:hover::before {
+  transform: translateX(2px);
 }
 
 .timeline-event__gallery {
@@ -479,6 +510,10 @@
   .timeline-event__photo:nth-child(n + 7) {
     grid-column: span 2;
   }
+
+  .timeline-event__card--content {
+    margin-top: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -498,10 +533,6 @@
 
   .timeline-event__marker span {
     font-size: 0.98rem;
-  }
-
-  .timeline-event__meta-list {
-    grid-template-columns: 1fr;
   }
 
   .timeline-event__gallery {

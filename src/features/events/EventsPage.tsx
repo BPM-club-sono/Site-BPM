@@ -34,6 +34,13 @@ type LightboxPhoto = {
   alt: string;
 };
 
+type MetaItem = {
+  icon: string;
+  label: string;
+  showLabel: boolean;
+  value: string;
+};
+
 const eventDataModules = import.meta.glob("../../assets/events_page/*/data.json", {
   eager: true,
   import: "default"
@@ -52,8 +59,7 @@ const getFolderNameFromPath = (path: string) => {
   return segments[segments.length - 2] ?? "";
 };
 
-const formatPeople = (count: number) => `${numberFormatter.format(count)} pers.`;
-const formatPrice = (amount: number) => `${numberFormatter.format(amount)} €`;
+const formatNumber = (value: number) => numberFormatter.format(value);
 
 const timelineEvents: TimelineEvent[] = (() => {
   const imagesByFolder = Object.entries(eventImageModules)
@@ -84,6 +90,15 @@ const timelineEvents: TimelineEvent[] = (() => {
     })
     .sort((leftEvent, rightEvent) => leftEvent.order - rightEvent.order);
 })();
+
+// Icon names come from the Material Symbols subset requested in index.html.
+// Only "Personnes" needs its label spelled out; the pin and the euro sign speak for themselves,
+// so their labels stay in the accessibility tree but leave the layout.
+const buildMetaItems = (event: TimelineEvent): MetaItem[] => [
+  { icon: "group", label: "Personnes", showLabel: true, value: formatNumber(event.personnes) },
+  { icon: "place", label: "Lieu", showLabel: false, value: event.where },
+  { icon: "euro", label: "Prix", showLabel: false, value: formatNumber(event.prix) }
+];
 
 const EventsPage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<LightboxPhoto | null>(null);
@@ -128,24 +143,26 @@ const EventsPage = () => {
               </header>
 
               <div className="timeline-event__cards">
-                <section className="timeline-event__card timeline-event__card--info" aria-label={`Infos ${event.name}`}>
+                <section
+                  className="timeline-event__card timeline-event__card--info"
+                  aria-label={`Infos ${event.name}`}
+                >
+                  <h3>Chiffres clés</h3>
                   <ul className="timeline-event__meta-list">
-                    <li>
-                      <span>Date</span>
-                      <strong>{event.when}</strong>
-                    </li>
-                    <li>
-                      <span>Personnes</span>
-                      <strong>{formatPeople(event.personnes)}</strong>
-                    </li>
-                    <li>
-                      <span>Lieu</span>
-                      <strong>{event.where}</strong>
-                    </li>
-                    <li>
-                      <span>Prix</span>
-                      <strong>{formatPrice(event.prix)}</strong>
-                    </li>
+                    {buildMetaItems(event).map((item) => (
+                      <li key={item.label}>
+                        <span
+                          className="material-symbols-outlined timeline-event__meta-icon"
+                          aria-hidden="true"
+                        >
+                          {item.icon}
+                        </span>
+                        <span className="timeline-event__meta-text">
+                          <strong>{item.value}</strong>
+                          <span className={item.showLabel ? undefined : "visually-hidden"}>{item.label}</span>
+                        </span>
+                      </li>
+                    ))}
                   </ul>
                 </section>
 
@@ -154,7 +171,7 @@ const EventsPage = () => {
                   aria-label={`Prestations ${event.name}`}
                 >
                   <h3>Mise en place</h3>
-                  <ul>
+                  <ul className="timeline-event__list">
                     {event.content.map((item, itemIndex) => (
                       <li key={`${event.slug}-content-${itemIndex}`}>{item}</li>
                     ))}
